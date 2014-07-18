@@ -5,9 +5,9 @@ package gooch
 // by clients to workers which should be interested.
 //
 // A controller can return data after a call, but it shouldn't be
-// considered or mandatory at all, that's the main process of 
+// considered or mandatory at all, that's the main process of
 // Gooch.
 type Controller interface {
-	Start()			// Start method for the controller. Called when Gooch is initializated.
-	Close()			// TODO
+    Start() // Start method for the controller. Called when Gooch is initializated.
+    Close() // TODO
 }

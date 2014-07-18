@@ -7,5 +7,5 @@ package gooch
 // RAM or wherever the storage system is configured
 // to write/read.
 type ResponseProvider interface {
-	GetResponse(id []byte) (*Response, error) // Returns the found response with the given ID.
+    GetResponse(id []byte) (*Response, error) // Returns the found response with the given ID.
 }
