@@ -1,4 +1,4 @@
-package gooch
+package gost
 
 // Response State error codes
 // Based on HTTP error codes for wider comprehension.

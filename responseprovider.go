@@ -1,4 +1,4 @@
-package gooch
+package gost
 
 // A Response Provider is the part which knows
 // where and how to look for responses.

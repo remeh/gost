@@ -1,4 +1,4 @@
-package gooch
+package gost
 
 // A task is delivered by a client to be
 // executed on a worker.
@@ -15,7 +15,7 @@ package gooch
 // on its task.
 type Task interface {
     GetId()         string // ID of this Task, provided by the client asking to run this task.
-    GetChannel()    string // In which channel this task should be sent. A channel kind of represent a listening app.
+    GetTopic()      string // In which topic this task should be sent. A topic kind of represent a listening app.
     GetAction()     string // Which action should be executed to run this task.
     GetData()       []byte // Actual data of the task.
     // XXX Don't we need a "type" or "subtype" here ?
@@ -25,22 +25,22 @@ type Task interface {
 // The whole data is stored in memory in a byte array.
 type SimpleTask struct {
     id          string
-    channel     string
+    topic       string
     action      string
     data        []byte
 }
 
 // Constructs a SimpleTask
-func NewSimpleTask(id string, channel string, action string, data []byte) {
-    return &{SimpleTask{id: id, channel: channel, action: action, data: data}
+func NewSimpleTask(id string, topic string, action string, data []byte) *SimpleTask {
+    return &SimpleTask{id: id, topic: topic, action: action, data: data}
 }
 
 func (t *SimpleTask) GetId() string {
     return t.id
 }
 
-func (t *SimpleTask) GetChannel() string {
-    return t.channel
+func (t *SimpleTask) GetTopic() string {
+    return t.topic
 }
 
 func (t *SimpleTask) GetAction() string {

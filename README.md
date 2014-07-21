@@ -1,4 +1,4 @@
-gooch
+Gost
 =====
 
 The lazy protocol.
