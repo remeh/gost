@@ -15,7 +15,7 @@ package gost
 // on its task.
 type Task interface {
     GetId()         string // ID of this Task, provided by the client asking to run this task.
-    GetTopic()      string // In which topic this task should be sent. A topic kind of represent a listening app.
+    GetTarget()     string // Targets of this ask (workers which understand this task)
     GetAction()     string // Which action should be executed to run this task.
     GetData()       []byte // Actual data of the task.
     // XXX Don't we need a "type" or "subtype" here ?
@@ -25,22 +25,22 @@ type Task interface {
 // The whole data is stored in memory in a byte array.
 type SimpleTask struct {
     id          string
-    topic       string
+    target      string
     action      string
     data        []byte
 }
 
 // Constructs a SimpleTask
-func NewSimpleTask(id string, topic string, action string, data []byte) *SimpleTask {
-    return &SimpleTask{id: id, topic: topic, action: action, data: data}
+func NewSimpleTask(id string, target string, data []byte) *SimpleTask {
+	return &SimpleTask{id: id, target: target, action: action, data: data}
 }
 
 func (t *SimpleTask) GetId() string {
     return t.id
 }
 
-func (t *SimpleTask) GetTopic() string {
-    return t.topic
+func (t *SimpleTask) GetTarget() string {
+    return t.target
 }
 
 func (t *SimpleTask) GetAction() string {

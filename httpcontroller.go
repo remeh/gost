@@ -47,15 +47,19 @@ func (a *HttpControllerAction) Execute(writer http.ResponseWriter, request *http
     if len(tid) == 0 {
         return 500, "No task id provided." // TODO json error response
     }
+	topic := parameters["topic"]
+	if len(topic) == 0 {
+		return 500, "No topic provided." // TODO json error response
+	}
 
-    // TODO broadcast the task to the workers.
+	// TODO read the body
+	body := []byte("Content of the task")
+
     //id      := uuid.New()
-    task    := NewSimpleTask(tid, "http", "echo", []byte("Content of the task"))
+    task    := NewSimpleTask(tid, topic, body)
 
     // Broadcast the task to the worker.
     a.gost.GetBroadcaster().Broadcast(task)
-
-    fmt.Println(task)
 
     return 200, ""
 }

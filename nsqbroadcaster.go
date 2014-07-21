@@ -14,7 +14,7 @@ type NsqBroadcaster struct {
 func (b *NsqBroadcaster) Broadcast(task Task) error {
     // TODO 
     //message := nsq.NewMessage(task.GetId(), task.GetData())
-    command := nsq.Publish(task.GetTopic(), task.GetData())
+    command := nsq.Publish(task.GetTarget(), task.GetData())
     fmt.Println(command)
     return nil
 }
