@@ -32,7 +32,7 @@ type SimpleTask struct {
 
 // Constructs a SimpleTask
 func NewSimpleTask(id string, target string, data []byte) *SimpleTask {
-	return &SimpleTask{id: id, target: target, action: action, data: data}
+    return &SimpleTask{id: id, target: target, action: action, data: data}
 }
 
 func (t *SimpleTask) GetId() string {

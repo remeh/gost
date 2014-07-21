@@ -47,13 +47,13 @@ func (a *HttpControllerAction) Execute(writer http.ResponseWriter, request *http
     if len(tid) == 0 {
         return 500, "No task id provided." // TODO json error response
     }
-	topic := parameters["topic"]
-	if len(topic) == 0 {
-		return 500, "No topic provided." // TODO json error response
-	}
+    topic := parameters["topic"]
+    if len(topic) == 0 {
+        return 500, "No topic provided." // TODO json error response
+    }
 
-	// TODO read the body
-	body := []byte("Content of the task")
+    // TODO read the body
+    body := []byte("Content of the task")
 
     //id      := uuid.New()
     task    := NewSimpleTask(tid, topic, body)
