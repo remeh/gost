@@ -19,9 +19,15 @@ func NewPrinterWorker(target string, action string) *PrinterWorker {
 
 func (w *PrinterWorker) Start() error {
     consumer, err := nsq.NewConsumer(w.target, w.action, nsq.NewConfig())
+
+    // XXX
+    consumer.ConnectToNSQLookupd("localhost:4160")
+
     if err != nil {
         return err;
     }
+
+    fmt.Println("[printer worker] Started")
 
     handler := nsq.HandlerFunc(func(m *nsq.Message) error {
         fmt.Printf("[writer] : %s\n", m)

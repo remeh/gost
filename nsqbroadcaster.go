@@ -18,7 +18,7 @@ func (b *NsqBroadcaster) Broadcast(task Task) error {
 
 func (b *NsqBroadcaster) Init() error {
     config := nsq.NewConfig()
-    producer, err := nsq.NewProducer("127.0.0.1:4150", config)
+    producer, err := nsq.NewProducer("localhost:4160", config)
     fmt.Println(b.producer)
     b.producer = *producer
     return err
