@@ -9,6 +9,6 @@ package gost
 type Application interface {
     Start(Gost)                     // Init method of the application
     Stop()
-    GetControllers() []Controller   // The controllers of the application.
-    GetWorkers() []Worker           // The workers of the application
+//  GetControllers() []Controller   // The controllers of the application.
+//  GetWorkers() []Worker           // The workers of the application
 }

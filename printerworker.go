@@ -1,6 +1,7 @@
 package gost
 
 import (
+    "fmt"
     "github.com/bitly/go-nsq"
 )
 
@@ -12,9 +13,29 @@ type PrinterWorker struct {
     action  string // the action to listen for
 }
 
-func (w *PrinterWorker) Start() {
-    // TODO consumer
+func NewPrinterWorker(target string, action string) *PrinterWorker {
+    return &PrinterWorker{target: target, action: action}
 }
 
-func (w *PrinterWorker) Close() {
+func (w *PrinterWorker) Start() error {
+    consumer, err := nsq.NewConsumer(w.target, w.action, nsq.NewConfig())
+    if err != nil {
+        return err;
+    }
+
+    handler := nsq.HandlerFunc(func(m *nsq.Message) error {
+        fmt.Printf("[writer] : %s\n", m)
+        return nil
+    })
+
+    consumer.AddHandler(handler)
+
+    return nil
+}
+
+func (w *PrinterWorker) Run(Task) []byte {
+    return nil
+}
+
+func (w *PrinterWorker) Stop() {
 }

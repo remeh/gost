@@ -23,7 +23,7 @@ func (c *HttpController) Start() {
     c.httpServer.Init()
 
     // A post action to receive the task to execute.
-    c.httpServer.Router.Add("Http controller action", "POST", &HttpControllerAction{c.gost}, "/:tid")
+    c.httpServer.Router.Add("Http controller action", "POST", &HttpControllerAction{c.gost}, "/:topic/:tid")
 
     // Let's listen for HTTP call in background.
     fmt.Printf("[gost] [HttpController] Starts on port %d\n", CONTROLLER_HTTP_PORT)

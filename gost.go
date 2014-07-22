@@ -7,17 +7,25 @@ import (
 // Has a set of applications to run.
 type Gost struct {
     applications    []Application
+    controllers     []Controller    // the activated controller
     broadcaster     Broadcaster     // the broadcaster to use
     exitChannel     chan int
 }
 
-func NewGost() {
-    return &Gost{applications: make([]Application, 1), exitChannel: make(chan int)}
+func NewGost() *Gost {
+    return &Gost{applications: make([]Application, 0), exitChannel: make(chan int)}
 }
 
 func (g *Gost) Run() {
     g.exitChannel = make(chan int)
 
+    // init the main broadcaster
+    g.initBroadcaster()
+
+    // init all the activated controllers
+    g.initControllers()
+
+    // start all the subscribed applications
     g.startApplications()
 
     <-g.exitChannel
@@ -26,8 +34,8 @@ func (g *Gost) Run() {
 // Cleans everything and stops the runtime.
 func (g *Gost) Exit() {
     // Closes the application
-    for i := 0; i < len(applications); i++ {
-        applications[i].Stop()
+    for i := 0; i < len(g.applications); i++ {
+        g.applications[i].Stop()
     }
     // Exit the main loop.
     g.exitChannel <- 1
@@ -38,13 +46,31 @@ func (g *Gost) GetBroadcaster() Broadcaster {
 }
 
 func (g *Gost) AddApplication(app Application) {
-    applications = append(applications, app)
+    g.applications = append(g.applications, app)
 }
 
 // Starts the application handled by Gost.
 // Each application is launched in a go routine.
 func (g *Gost) startApplications() {
-    for i := 0; i < len(applications); i++ {
-        go applications[i].Start(*g)
+    for i := 0; i < len(g.applications); i++ {
+        go g.applications[i].Start(*g)
     }
+}
+
+// Inits the broadcaster
+func (g *Gost) initBroadcaster() {
+    // TODO configuration, etc.
+    g.broadcaster = &NsqBroadcaster{}
+    g.broadcaster.Init()
+}
+
+// Inits the controllers
+func (g *Gost) initControllers() {
+    // TODO configuration etc.
+    g.controllers = make([]Controller, 1)
+
+    // HTTP Controller
+    httpController := &HttpController{gost: *g}
+    httpController.Start()
+    g.controllers = append(g.controllers, httpController)
 }
