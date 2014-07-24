@@ -1,8 +1,8 @@
 package gost
 
 import (
-        "fmt"
-    "github.com/bitly/go-nsq"
+     "fmt"
+     "github.com/bitly/go-nsq"
 )
 
 // A broadcaster which uses the NSQ
@@ -16,9 +16,9 @@ func (b *NsqBroadcaster) Broadcast(task Task) error {
     return err
 }
 
-func (b *NsqBroadcaster) Init() error {
+func (b *NsqBroadcaster) Init(addr string) error {
     config := nsq.NewConfig()
-    producer, err := nsq.NewProducer("127.0.0.1:4150", config)
+    producer, err := nsq.NewProducer(addr, config)
     fmt.Println(b.producer)
     b.producer = *producer
     return err

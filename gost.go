@@ -1,6 +1,7 @@
 package gost
 
 import (
+    "fmt"
 )
 
 // The Gost runtime.
@@ -9,6 +10,7 @@ type Gost struct {
     applications    []Application
     controllers     []Controller    // the activated controller
     broadcaster     Broadcaster     // the broadcaster to use
+    config          Config
     exitChannel     chan int
 }
 
@@ -18,6 +20,8 @@ func NewGost() *Gost {
 
 func (g *Gost) Run() {
     g.exitChannel = make(chan int)
+
+    g.config = *ReadConfig("config.yaml")
 
     // init the main broadcaster
     g.initBroadcaster()
@@ -59,8 +63,13 @@ func (g *Gost) startApplications() {
 
 // Inits the broadcaster
 func (g *Gost) initBroadcaster() {
-    // TODO configuration, etc.
-    g.broadcaster = &NsqBroadcaster{}
+    if (g.config.Broadcaster == "nsq") {
+        g.broadcaster = &NsqBroadcaster{}
+
+        if len(g.config.Nsqds) == 0 && len(g.config.Nsqlookupds) == 0 {
+           fmt.Println("[gost] [ERROR] : can't init the nsqbroadcaster : no connect point supplied.")
+       }
+    }
     g.broadcaster.Init()
 }
 
