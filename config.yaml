@@ -4,3 +4,5 @@ controllers:
 
 nsqlookupds:
   - "127.0.0.1:4160"
+#nsqds:
+#  - "127.0.0.1:4150"

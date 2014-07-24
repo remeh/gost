@@ -1,7 +1,6 @@
 package gost
 
 import (
-    "fmt"
 )
 
 // The Gost runtime.
@@ -65,12 +64,8 @@ func (g *Gost) startApplications() {
 func (g *Gost) initBroadcaster() {
     if (g.config.Broadcaster == "nsq") {
         g.broadcaster = &NsqBroadcaster{}
-
-        if len(g.config.Nsqds) == 0 && len(g.config.Nsqlookupds) == 0 {
-           fmt.Println("[gost] [ERROR] : can't init the nsqbroadcaster : no connect point supplied.")
-       }
     }
-    g.broadcaster.Init()
+    g.broadcaster.Init(g.config)
 }
 
 // Inits the controllers
