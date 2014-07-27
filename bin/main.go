@@ -8,8 +8,6 @@ import (
 
 func main() {
     g := gost.NewGost()
-
-    g.AddApplication(&gost.WriterApplication{})
-
+    g.AddApplication(gost.NewWriterApplication())
     g.Run()
 }

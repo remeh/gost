@@ -1,14 +1,14 @@
 package gost
 
 import (
-        "fmt"
-    "github.com/bitly/go-nsq"
+     "fmt"
+     "github.com/bitly/go-nsq"
 )
 
 // A broadcaster which uses the NSQ
 // message-queue system to broadcast tasks to worker.
 type NsqBroadcaster struct {
-    producer nsq.Producer
+    producer    nsq.Producer
 }
 
 func (b *NsqBroadcaster) Broadcast(task Task) error {
@@ -16,14 +16,30 @@ func (b *NsqBroadcaster) Broadcast(task Task) error {
     return err
 }
 
-func (b *NsqBroadcaster) Init() error {
-    config := nsq.NewConfig()
-    producer, err := nsq.NewProducer("localhost:4160", config)
-    fmt.Println(b.producer)
+func (b *NsqBroadcaster) Init(config Config) error {
+    // Use the config to know to which address
+    // we want to connect for NSQ
+    addr := ""
+
+    // TODO use the list of address provided.
+
+    if len(config.Nsqds) != 0 {
+        addr = config.Nsqds[0]
+    } else {
+        addr = config.Nsqlookupds[0]
+    }
+
+    if len(addr) == 0 {
+       fmt.Println("[gost] [ERROR] : can't init the nsqbroadcaster : no connect point supplied.")
+    }
+
+    // Creates the producer
+    producer, err := nsq.NewProducer(addr, nsq.NewConfig())
     b.producer = *producer
     return err
 }
 
 func (b *NsqBroadcaster) Close() {
+    b.producer.Stop()
 }
 

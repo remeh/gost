@@ -9,6 +9,7 @@ type Gost struct {
     applications    []Application
     controllers     []Controller    // the activated controller
     broadcaster     Broadcaster     // the broadcaster to use
+    config          Config
     exitChannel     chan int
 }
 
@@ -18,6 +19,8 @@ func NewGost() *Gost {
 
 func (g *Gost) Run() {
     g.exitChannel = make(chan int)
+
+    g.config = *ReadConfig("config.yaml")
 
     // init the main broadcaster
     g.initBroadcaster()
@@ -59,9 +62,10 @@ func (g *Gost) startApplications() {
 
 // Inits the broadcaster
 func (g *Gost) initBroadcaster() {
-    // TODO configuration, etc.
-    g.broadcaster = &NsqBroadcaster{}
-    g.broadcaster.Init()
+    if (g.config.Broadcaster == "nsq") {
+        g.broadcaster = &NsqBroadcaster{}
+    }
+    g.broadcaster.Init(g.config)
 }
 
 // Inits the controllers

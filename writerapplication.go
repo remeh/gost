@@ -2,18 +2,17 @@ package gost
 
 import (
     "fmt"
-//  "github.com/bitly/go-nsq"
 )
 
 type WriterApplication struct {
-//  gost        Gost            // the gost runtime instance
-//  controllers []Controller    // the controllers running
     workers     []Worker        // the instanciated worker
 }
 
+func NewWriterApplication() *WriterApplication {
+    return &WriterApplication{}
+}
+
 func (a *WriterApplication) Start(gost Gost) {
-//  a.gost = gost
-//  a.initControllers()
     a.initWorkers()
 }
 
