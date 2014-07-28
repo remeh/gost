@@ -28,9 +28,10 @@ func (a *WriterApplication) initWorkers(gost Gost) {
     printer := NewPrinterWorker("printer_application", "writer")
     err := printer.Start(gost)
     if err != nil {
-        fmt.Println("Error while starting the workers of WriterApplication : ")
-        fmt.Println(err)
+        fmt.Println("[APPLICATION] [writer] ERROR - while starting the workers of WriterApplication : ")
+        fmt.Printf("[APPLICATION] [writer] ERROR - %s\n", err)
+    } else {
+        fmt.Println("[APPLICATION] [writer] Writer application started.")
+        a.workers = append(a.workers, printer)
     }
-    fmt.Println("[writer] Writer application started.")
-    a.workers = append(a.workers, printer)
 }

@@ -25,16 +25,14 @@ func (b *NsqBroadcaster) Init(config Config) error {
 
     if len(config.Nsqds) != 0 {
         addr = config.Nsqds[0]
-    } else {
-        addr = config.Nsqlookupds[0]
     }
 
     if len(addr) == 0 {
-       fmt.Println("[gost] [ERROR] : can't init the nsqbroadcaster : no connect point supplied.")
+       fmt.Println("[BROADCASTER] [nsq] ERROR - Can't init the nsqbroadcaster : no connect point supplied.")
     }
 
     // Creates the producer
-    producer, err := nsq.NewProducer(addr, nsq.NewConfig())
+    producer, err := nsq.NewProducer("localhost:4150", nsq.NewConfig())
     b.producer = *producer
     return err
 }

@@ -34,8 +34,8 @@ func ReadConfig(filename string) *Config {
     var c Config
     yaml.Unmarshal(content, &c)
 
-    fmt.Println("[gost] Read configuration : ")
-    fmt.Println(c)
+    fmt.Println("[GOST] [CONFIG] Read.")
+    fmt.Printf("[GOST] [CONFIG] %s\n", c)
 
     return &c
 }
@@ -46,8 +46,8 @@ func DefaultConfig() *Config {
 }
 
 func ConfigError(filename string, err error) *Config {
-    fmt.Println("[gost] Error reading the config file : " + filename);
+    fmt.Println("[GOST] Error reading the config file : " + filename);
     fmt.Println(err)
-    fmt.Println("[gost] Will use default configuration.")
+    fmt.Println("[GOST] Will use default configuration.")
     return DefaultConfig()
 }

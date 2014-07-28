@@ -1,6 +1,7 @@
 package gost
 
 import (
+    "errors"
     "fmt"
     "github.com/bitly/go-nsq"
 )
@@ -19,22 +20,22 @@ func NewPrinterWorker(target string, action string) *PrinterWorker {
 }
 
 func (w *PrinterWorker) Start(gost Gost) error {
+    // Creates the new consumer
     consumer, err := nsq.NewConsumer(w.target, w.action, nsq.NewConfig())
 
     if err != nil {
         return err;
     }
 
+    // Stores it in the worker
     w.consumer = *consumer
 
-    fmt.Println("[printer worker] Started")
+    fmt.Println("[WORKER] [writer] Created")
 
-    handler := nsq.HandlerFunc(func(m *nsq.Message) error {
-        fmt.Printf("[writer] : %s\n", m)
-        return nil
-    })
+    // The worker handle the message reception
+    w.consumer.AddHandler(w)
 
-    consumer.AddHandler(handler)
+    fmt.Println("[WORKER] [writer] Handler attached.")
 
     // Connects the worker to NSQ
     return w.Connect(gost)
@@ -45,32 +46,30 @@ func (w *PrinterWorker) Connect(gost Gost) error {
 
     // Use the config to know to which address
     // we want to connect for NSQ
+    var err error
 
-    // TODO use the list of address provided.
-    addr := ""
-
-    if len(config.Nsqds) != 0 {
-        addr = config.Nsqds[0]
+    if len(config.Nsqlookupds) != 0 {
+        err = w.consumer.ConnectToNSQLookupds(config.Nsqlookupds)
     } else {
-        addr = config.Nsqlookupds[0]
+        err = w.consumer.ConnectToNSQDs(config.Nsqds)
     }
-
-    if len(addr) == 0 {
-       fmt.Println("[gost] [ERROR] : can't connect the printer worker, no connect point supplied.")
-    }
-
-    // Finally, connect.
-    err := w.consumer.ConnectToNSQLookupd(addr)
 
     if err != nil {
-        fmt.Println("[error] Unable to connect the PrinterWorker")
-        return err
+        fmt.Println("[WORKER] [writer] ERROR - Unable to connect the PrinterWorker : ")
+        fmt.Printf("[WORKER] [writer] ERROR - %s\n", err)
+        return errors.New("Unable to start the PrinterWorker")
     }
 
     return nil
 }
 
+func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
+    fmt.Printf("[WORKER] [writer] %s\n", m)
+    return nil
+}
+
 func (w *PrinterWorker) Run(Task) []byte {
+    // TODO
     return nil
 }
 

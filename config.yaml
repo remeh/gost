@@ -2,7 +2,7 @@ broadcaster: nsq
 controllers:
   - http
 
-#nsqlookupds:
-#  - "127.0.0.1:4160"
+nsqlookupds:
+  - "127.0.0.1:4161"
 nsqds:
   - "127.0.0.1:4150"
