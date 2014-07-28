@@ -17,7 +17,7 @@ func NewPrinterWorker(target string, action string) *PrinterWorker {
     return &PrinterWorker{target: target, action: action}
 }
 
-func (w *PrinterWorker) Start() error {
+func (w *PrinterWorker) Start(gost Gost) error {
     consumer, err := nsq.NewConsumer(w.target, w.action, nsq.NewConfig())
     if err != nil {
         return err;
@@ -29,6 +29,9 @@ func (w *PrinterWorker) Start() error {
     })
 
     consumer.AddHandler(handler)
+
+    // TODO
+    consumer.ConnectToNSQLookupd("127.0.0.1:4161")
 
     return nil
 }

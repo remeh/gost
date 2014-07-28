@@ -13,7 +13,7 @@ func NewWriterApplication() *WriterApplication {
 }
 
 func (a *WriterApplication) Start(gost Gost) {
-    a.initWorkers()
+    a.initWorkers(gost)
 }
 
 func (a *WriterApplication) Stop() {
@@ -23,10 +23,10 @@ func (a *WriterApplication) Stop() {
 }
 
 // Inits the workers
-func (a *WriterApplication) initWorkers() {
+func (a *WriterApplication) initWorkers(gost Gost) {
     a.workers = make([]Worker, 1)
     printer := NewPrinterWorker("printer_application", "writer")
-    printer.Start()
+    printer.Start(gost)
     fmt.Println("[application] Writer application started.")
     a.workers = append(a.workers, printer)
 }

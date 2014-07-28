@@ -5,7 +5,7 @@ package gost
 // in the storage system to be available when
 // dest clients come for data.
 type Worker interface {
-    Start() error
+    Start(gost Gost) error
     Stop()
     Run(Task) []byte    // Executes the supplied task given by the broadcaster
 }
