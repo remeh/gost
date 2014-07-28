@@ -48,6 +48,10 @@ func (g *Gost) GetBroadcaster() Broadcaster {
     return g.broadcaster
 }
 
+func (g *Gost) GetConfig() Config {
+    return g.config
+}
+
 func (g *Gost) AddApplication(app Application) {
     g.applications = append(g.applications, app)
 }

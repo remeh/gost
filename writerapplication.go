@@ -26,7 +26,11 @@ func (a *WriterApplication) Stop() {
 func (a *WriterApplication) initWorkers(gost Gost) {
     a.workers = make([]Worker, 1)
     printer := NewPrinterWorker("printer_application", "writer")
-    printer.Start(gost)
-    fmt.Println("[application] Writer application started.")
+    err := printer.Start(gost)
+    if err != nil {
+        fmt.Println("Error while starting the workers of WriterApplication : ")
+        fmt.Println(err)
+    }
+    fmt.Println("[writer] Writer application started.")
     a.workers = append(a.workers, printer)
 }
