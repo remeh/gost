@@ -12,7 +12,7 @@ import (
 type PrinterWorker struct {
     target      string          // target represented by this worker
     action      string          // the action to listen for
-    consumer    nsq.Consumer    // the NSQ consumer listening for work
+    consumer    *nsq.Consumer    // the NSQ consumer listening for work
 }
 
 func NewPrinterWorker(target string, action string) *PrinterWorker {
@@ -22,7 +22,7 @@ func NewPrinterWorker(target string, action string) *PrinterWorker {
 func (w *PrinterWorker) Start(gost Gost) error {
     // Creates the new consumer
     config := nsq.NewConfig()
-    config.MaxInFlight = 20
+    config.MaxInFlight = 5
     consumer, err := nsq.NewConsumer(w.target, w.action, config)
 
     if err != nil {
@@ -30,12 +30,12 @@ func (w *PrinterWorker) Start(gost Gost) error {
     }
 
     // Stores it in the worker
-    w.consumer = *consumer
+    w.consumer = consumer
 
     fmt.Println("[WORKER] [writer] Created")
 
     // The worker handle the message reception
-    w.consumer.AddConcurrentHandlers(w, 1)
+    w.consumer.AddHandler(w)
 
     fmt.Println("[WORKER] [writer] Handler attached.")
 
@@ -67,6 +67,7 @@ func (w *PrinterWorker) Connect(gost Gost) error {
 
 func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
     fmt.Printf("[WORKER] [writer] %s\n", m)
+    m.Finish()
     return nil
 }
 
