@@ -21,7 +21,9 @@ func NewPrinterWorker(target string, action string) *PrinterWorker {
 
 func (w *PrinterWorker) Start(gost Gost) error {
     // Creates the new consumer
-    consumer, err := nsq.NewConsumer(w.target, w.action, nsq.NewConfig())
+    config := nsq.NewConfig()
+    config.MaxInFlight = 20
+    consumer, err := nsq.NewConsumer(w.target, w.action, config)
 
     if err != nil {
         return err;
@@ -33,7 +35,7 @@ func (w *PrinterWorker) Start(gost Gost) error {
     fmt.Println("[WORKER] [writer] Created")
 
     // The worker handle the message reception
-    w.consumer.AddHandler(w)
+    w.consumer.AddConcurrentHandlers(w, 1)
 
     fmt.Println("[WORKER] [writer] Handler attached.")
 
@@ -59,9 +61,9 @@ func (w *PrinterWorker) Connect(gost Gost) error {
         fmt.Printf("[WORKER] [writer] ERROR - %s\n", err)
         return errors.New("Unable to start the PrinterWorker")
     }
-
     return nil
 }
+
 
 func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
     fmt.Printf("[WORKER] [writer] %s\n", m)
