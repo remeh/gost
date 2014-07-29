@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <title>Introduction to NSQ with go-nsq</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <h1>Practical introduction to NSQ with go-nsq</h1>
+                <h4>Written by <a href="http://remy.io" alt="Rémy MATHIEU website"><em>R&eacute;my MATHIEU</em></a></h4>
+            </div>
+            <hr>
+            <div class="row">
+            <h2>Index</h3>
+
+            </div>
+            <div class="row">
+            <h2>Introduction</h2>
+                <p>
+                    This tutorial intends to give a practical example of using NSQ with go-nsq, it doesn't intend to explain how to create a full application with NSQ.
+                </p>
+                <p>
+                    Note that this document has been written while creating the <a href="https://github.com/remeh/gost">Gost</a> service, some things could be inaccurate or misinterpreted, don't hesitate to send me an email or proposing a pull request to correct.<br>
+                    While redacting this document, the author assumed that you have <em>golang</em> installed and that you know the basics. You can find documentation for <a href="http://golang.org" alt="golang's website"><em>golang</em> on their website</a>.<br>
+                    The main source of information for this document is the website of <a href="http://nsq.io" alt="NSQ's website">NSQ</a>, please refer to it.
+                </p>
+            </div>
+            <div class="row">
+            <h2>Getting started</h2>
+                <h3>Installation</h3>
+                    <h4>Downloading NSQ</h4>
+                        <p>
+                            NSQ can be downloaded from the official website on their <a href="http://nsq.io/deployment/installing.html" alt="NSQ download">installing</a> page.
+                        </p>
+                        <p>
+                            Three binaries interest us in the archive :
+                            <ul>
+                                <li><code>nsqlookupd</code></li>
+                                <li><code>nsqd</code></li>
+                                <li><code>nsqadmin</code></li>
+                            </ul>
+                        </p>                             
+                        <p>
+                            The first one, <code>nsqlookupd</code> is the discovery service managing the topology information, <code>nsqd</code> is the actual queue-messaging server and <code>nsqadmin</code> is an admin tool to visualize the work of your servers.
+                        </p>
+                <h3>Launching NSQ</h3>
+                    <p>
+                        The discovery service <code>nslookupd</code> must be launched first, as it represent one point of entry to your different <code>nsqd</code> daemons. To avoid any SPOF, NSQ makes possible to launch many <code>nslookupds</code> in a topology. Only one will be needed for this example :
+                        <pre>nsqlookupd</pre>
+                    </p>
+                    <p>
+                        The second step will be to launch the actual messaging service <code>nsqd</code> and to provide the launched <code>nsqlookupd</code> to contact to declare its existence :
+                        <pre>nsqd --lookupd-tcp-address=127.0.0.1:4160</pre>
+                        As of now, we have a topology capable of sending and receiving messages, with the ability to scale up and to be reliable simply by launching new <code>nsqlookupd</code> and <code>nsqd</code>.
+                    </p>
+                <h3>Principes of NSQ / NSQ design</h3>
+                    <p>
+                        My best advice would still be to go read these pages on the official website : <a href="http://nsq.io/overview/design.html">NSQ design</a> and <a href="http://nsq.io/overview/faq.html">NSQ FAQ</a>.
+                </p>
+                <p>
+                    <img src="https://f.cloud.github.com/assets/187441/1700696/f1434dc8-6029-11e3-8a66-18ca4ea10aca.gif"><br>
+                    <blockquote>From the NSQ website<small>To summarize, messages are multicast from topic -&gt; channel (every channel receives a copy of all messages for that topic) but evenly distributed from channel -&gt; consumers (each consumer receives a portion of the messages for that channel).</small></blockquote>
+                </p>
+        <h3>Application structure</h3> 
+        </div>
+        <div class="row">
+        <h2>Producing</h2>
+            <h3>Producer</h3>
+            <h3>Publishing</h3>
+        </div>
+        <div class="row">
+        <h2>Consuming</h2>
+            <h3>Consumer</h3>
+            <h3>Consuming</h3>
+        </div>
+        <div class="row">
+        <h2>What next ?</h2>
+        </div>
+        <div class="row">
+        <h2>FAQ</h2>
+        </div>
+    </div>
+</body>
+</html>
