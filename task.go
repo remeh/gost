@@ -59,13 +59,13 @@ func NewSimpleTask(uuid string, target string, action string, data []byte) *Simp
 
 func UnserializeSimpleTask(data []byte) *SimpleTask {
     // Magic number 01
-    if byte[0] != 0 || byte[1] != 1 {
+    if data[0] != 0 || data[1] != 1 {
         return nil
     }
 
     // TODO
 
-    return serialized
+    return nil
 }
 
 func (t *SimpleTask) GetId() string {
