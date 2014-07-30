@@ -1,8 +1,10 @@
 package gost
 
 import (
-    "strings"
+    "bytes"
     "encoding/binary"
+    "fmt"
+    "strings"
 )
 
 // A task is delivered by a client to be
@@ -43,8 +45,6 @@ func NewSimpleTask(uuid string, target string, action string, data []byte) *Simp
     withoutHyphen := strings.Replace(uuid, "-", "", -1)
 
     if len(withoutHyphen) > 32 {
-        println(withoutHyphen)
-        println(len(withoutHyphen))
         return nil
     }
     if len(target) > 32 {
@@ -58,14 +58,37 @@ func NewSimpleTask(uuid string, target string, action string, data []byte) *Simp
 }
 
 func UnserializeSimpleTask(data []byte) *SimpleTask {
+
     // Magic number 01
     if data[0] != 0 || data[1] != 1 {
         return nil
     }
 
-    // TODO
+    // Task ID
+    a := data[2:10]
+    b := data[10:14]
+    c := data[14:18]
+    d := data[18:22]
+    e := data[22:34]
+    uuid := fmt.Sprintf("%s-%s-%s-%s-%s", a, b, c, d, e)
 
-    return nil
+    // Target
+    target := string(data[34:66])
+
+    // Action
+    action := string(data[66:98])
+
+    // Length
+    length, err := binary.ReadUvarint(bytes.NewBuffer(data[98:106]))
+    if err != nil {
+        // TODO
+        return nil
+    }
+
+    // Data
+    readData := data[106:106+length]
+
+    return NewSimpleTask(uuid, target, action, readData)
 }
 
 func (t *SimpleTask) GetId() string {
@@ -95,7 +118,8 @@ func (t *SimpleTask) Serialize() []byte {
     serialized := make([]byte, 2 + 32 + 32 + 32 + 8 + len(t.data))
 
     // Magic number
-    copy(serialized[0:], []byte("01"))
+    serialized[0] = 0
+    serialized[1] = 1
 
     // Task ID
     copy(serialized[2:], []byte(t.id));

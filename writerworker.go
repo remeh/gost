@@ -66,13 +66,14 @@ func (w *PrinterWorker) Connect(gost Gost) error {
 
 
 func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
-    fmt.Printf("[WORKER] [writer] %s\n", m.Body)
+    task := UnserializeSimpleTask(m.Body)
+    w.Run(task)
     m.Finish()
     return nil
 }
 
-func (w *PrinterWorker) Run(Task) []byte {
-    // TODO
+func (w *PrinterWorker) Run(task Task) []byte {
+    fmt.Printf("[WORKER] [writer] [Target: %s] [Action: %s] %s\n", task.GetTarget(), task.GetAction(), task.GetData())
     return nil
 }
 
