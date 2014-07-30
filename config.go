@@ -17,9 +17,11 @@ const (
 type Config struct {
     Broadcaster string   // which broadcaster should we use.
     Controllers []string // which controllers should be started.
+    Storage string       // which storage we should use
 
     Nsqlookupds []string // when we want to connect to nslookupds
     Nsqds []string       // when we want to connect directly to nsqds
+    Etcds []string       // Read the hosts to connect to Etcd
 }
 
 func ReadConfig(filename string) *Config {
@@ -35,7 +37,6 @@ func ReadConfig(filename string) *Config {
     yaml.Unmarshal(content, &c)
 
     fmt.Println("[GOST] [CONFIG] Read.")
-    fmt.Printf("[GOST] [CONFIG] %s\n", c)
 
     return &c
 }

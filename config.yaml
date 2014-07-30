@@ -1,8 +1,10 @@
-broadcaster: nsq
+broadcaster: "nsq"
 controllers:
-  - http
-
+  - "http"
+storage: "etcd"
 nsqlookupds:
   - "127.0.0.1:4161"
 nsqds:
   - "127.0.0.1:4150"
+etcds:
+  - "http://127.0.0.1:4001"

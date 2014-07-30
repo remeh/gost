@@ -8,6 +8,7 @@ import (
 type Gost struct {
     applications    []Application
     controllers     []Controller    // the activated controller
+    storage         Storage         // the storage to use
     broadcaster     Broadcaster     // the broadcaster to use
     config          Config
     exitChannel     chan int
@@ -24,6 +25,9 @@ func (g *Gost) Run() {
 
     // init the main broadcaster
     g.initBroadcaster()
+
+    // init the storage system
+    g.initStorage()
 
     // init all the activated controllers
     g.initControllers()
@@ -46,6 +50,10 @@ func (g *Gost) Exit() {
 
 func (g *Gost) GetBroadcaster() Broadcaster {
     return g.broadcaster
+}
+
+func (g *Gost) GetStorage() Storage {
+    return g.storage
 }
 
 func (g *Gost) GetConfig() Config {
@@ -72,12 +80,20 @@ func (g *Gost) initBroadcaster() {
     g.broadcaster.Init(g.config)
 }
 
+// Inits the storage
+func (g *Gost) initStorage() {
+    if g.config.Storage == "etcd" {
+        g.storage = &EtcdStorage{}
+    }
+    g.storage.Init(g.config)
+}
+
 // Inits the controllers
 func (g *Gost) initControllers() {
     g.controllers = make([]Controller, len(g.config.Controllers))
     for _, c := range g.config.Controllers {
         switch {
-            case c == "nsq": {
+            case c == "http": {
                 // HTTP Controller
                 httpController := &HttpController{gost: *g}
                 httpController.Start()

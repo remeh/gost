@@ -10,4 +10,5 @@ The lazy protocol.
   go get github.com/bitly/go-nsq
   go get code.google.com/p/go-uuid
   go get gopkg.in/yaml.v1
+  go get github.com/coreos/go-etcd/etcd
 ```

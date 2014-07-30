@@ -3,8 +3,6 @@ package gost
 import (
     "bytes"
     "encoding/binary"
-    "fmt"
-    "strings"
 )
 
 // A task is delivered by a client to be
@@ -41,9 +39,7 @@ type SimpleTask struct {
 // A simple task is serialized in binary for quicker serialization/deserialization
 // and a tiny weight.
 func NewSimpleTask(uuid string, target string, action string, data []byte) *SimpleTask {
-    withoutHyphen := strings.Replace(uuid, "-", "", -1)
-
-    if len(withoutHyphen) > 32 {
+    if len(uuid) > 36 {
         return nil
     }
     if len(target) > 32 {
@@ -53,7 +49,7 @@ func NewSimpleTask(uuid string, target string, action string, data []byte) *Simp
         return nil
     }
 
-    return &SimpleTask{id: withoutHyphen, target: target, action: action, data: data}
+    return &SimpleTask{id: uuid, target: target, action: action, data: data}
 }
 
 func UnserializeSimpleTask(data []byte) *SimpleTask {
@@ -64,27 +60,22 @@ func UnserializeSimpleTask(data []byte) *SimpleTask {
     }
 
     // Task ID
-    a := data[2:10]
-    b := data[10:14]
-    c := data[14:18]
-    d := data[18:22]
-    e := data[22:34]
-    uuid := fmt.Sprintf("%s-%s-%s-%s-%s", a, b, c, d, e)
+    uuid := string(data[2:38])
 
     // Target
-    target := string(data[34:66])
+    target := string(data[38:70])
 
     // Action
-    action := string(data[66:98])
+    action := string(data[70:102])
 
     // Length
-    length, err := binary.ReadUvarint(bytes.NewBuffer(data[98:106]))
+    length, err := binary.ReadUvarint(bytes.NewBuffer(data[102:110]))
     if err != nil {
         return nil
     }
 
     // Data
-    readData := data[106:106+length]
+    readData := data[110:110+length]
 
     return NewSimpleTask(uuid, target, action, readData)
 }
@@ -113,7 +104,7 @@ func (t *SimpleTask) GetData() []byte {
 // 8 bytes      : data length : n
 // n bytes      : data
 func (t *SimpleTask) Serialize() []byte {
-    serialized := make([]byte, 2 + 32 + 32 + 32 + 8 + len(t.data))
+    serialized := make([]byte, 2 + 36 + 32 + 32 + 8 + len(t.data))
 
     // Magic number
     serialized[0] = 0
@@ -123,16 +114,16 @@ func (t *SimpleTask) Serialize() []byte {
     copy(serialized[2:], []byte(t.id));
 
     // Target
-    copy(serialized[34:], []byte(t.target))
+    copy(serialized[38:], []byte(t.target))
 
     // Action
-    copy(serialized[66:], []byte(t.action))
+    copy(serialized[70:], []byte(t.action))
 
     // Len
-    binary.PutUvarint(serialized[98:], uint64(len(t.data)))
+    binary.PutUvarint(serialized[102:], uint64(len(t.data)))
 
     // Data
-    copy(serialized[106:], t.data)
+    copy(serialized[110:], t.data)
 
     return serialized
 }

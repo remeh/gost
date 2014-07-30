@@ -12,7 +12,8 @@ import (
 type PrinterWorker struct {
     target      string          // target represented by this worker
     action      string          // the action to listen for
-    consumer    *nsq.Consumer    // the NSQ consumer listening for work
+    consumer    *nsq.Consumer   // the NSQ consumer listening for work
+    gost        Gost            // instance of the Gost service
 }
 
 func NewPrinterWorker(target string, action string) *PrinterWorker {
@@ -20,6 +21,8 @@ func NewPrinterWorker(target string, action string) *PrinterWorker {
 }
 
 func (w *PrinterWorker) Start(gost Gost) error {
+    w.gost = gost
+
     // Creates the new consumer
     config := nsq.NewConfig()
     config.MaxInFlight = 5
@@ -77,6 +80,8 @@ func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
 
 func (w *PrinterWorker) Run(task Task) []byte {
     fmt.Printf("[WORKER] [writer] [Target: %s] [Action: %s] %s\n", task.GetTarget(), task.GetAction(), task.GetData())
+    // Store the result
+    w.gost.GetStorage().Store(task.GetId(), task.GetData())
     return nil
 }
 
