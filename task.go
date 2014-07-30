@@ -25,8 +25,7 @@ type Task interface {
     GetTarget()     string // Targets of this ask (workers which understand this task)
     GetAction()     string // Which action should be executed to run this task.
     GetData()       []byte // Actual data of the task.
-    Serialize()     []byte
-    //Unserialize()   []byte
+    Serialize()     []byte // Serialize the task to send it on the broadcaster
 }
 
 // Simple implementation of a Task
@@ -81,7 +80,6 @@ func UnserializeSimpleTask(data []byte) *SimpleTask {
     // Length
     length, err := binary.ReadUvarint(bytes.NewBuffer(data[98:106]))
     if err != nil {
-        // TODO
         return nil
     }
 

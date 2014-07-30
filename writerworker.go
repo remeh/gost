@@ -67,6 +67,9 @@ func (w *PrinterWorker) Connect(gost Gost) error {
 
 func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
     task := UnserializeSimpleTask(m.Body)
+    if task == nil {
+        return errors.New(fmt.Sprintf("Unable to unserialize the task : %s", m.Body))
+    }
     w.Run(task)
     m.Finish()
     return nil

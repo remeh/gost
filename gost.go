@@ -74,11 +74,15 @@ func (g *Gost) initBroadcaster() {
 
 // Inits the controllers
 func (g *Gost) initControllers() {
-    // TODO configuration etc.
-    g.controllers = make([]Controller, 1)
-
-    // HTTP Controller
-    httpController := &HttpController{gost: *g}
-    httpController.Start()
-    g.controllers = append(g.controllers, httpController)
+    g.controllers = make([]Controller, len(g.config.Controllers))
+    for _, c := range g.config.Controllers {
+        switch {
+            case c == "nsq": {
+                // HTTP Controller
+                httpController := &HttpController{gost: *g}
+                httpController.Start()
+                g.controllers = append(g.controllers, httpController)
+            }
+        }
+    }
 }

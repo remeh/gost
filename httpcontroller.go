@@ -46,26 +46,25 @@ func (a *HttpControllerAction) Init() {
 func (a *HttpControllerAction) Execute(writer http.ResponseWriter, request *http.Request, parameters map[string]string) (int, string) {
     tid := parameters["tid"]
     if len(tid) == 0 {
-        return 500, "No task id provided." // TODO json error response
+        return 500, "" // TODO json error response
     }
 
     topic := parameters["topic"]
     if len(topic) == 0 {
-        return 500, "No topic provided." // TODO json error response
+        return 500, "" // TODO json error response
     }
 
     action := parameters["action"]
     if len(topic) == 0 {
-        return 500, "No actionprovided." // TODO json error response
+        return 500, "" // TODO json error response
     }
 
-    // TODO read the body
+    // read the body
     body, err := ioutil.ReadAll(request.Body)
     if err != nil {
-        return 500, "Unable to read the body." // TODO json error response
+        return 500, "" // TODO json error response
     }
 
-    //id      := uuid.New()
     task    := NewSimpleTask(tid, topic, action, body)
 
     // Broadcast the task to the worker.
