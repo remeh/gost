@@ -1,5 +1,10 @@
 package gost
 
+import (
+    "strings"
+    "encoding/binary"
+)
+
 // A task is delivered by a client to be
 // executed on a worker.
 //
@@ -18,7 +23,8 @@ type Task interface {
     GetTarget()     string // Targets of this ask (workers which understand this task)
     GetAction()     string // Which action should be executed to run this task.
     GetData()       []byte // Actual data of the task.
-    // XXX Don't we need a "type" or "subtype" here ?
+    Serialize()     []byte
+    //Unserialize()   []byte
 }
 
 // Simple implementation of a Task
@@ -30,9 +36,36 @@ type SimpleTask struct {
     data        []byte
 }
 
-// Constructs a SimpleTask
-func NewSimpleTask(id string, target string, data []byte) *SimpleTask {
-    return &SimpleTask{id: id, target: target, data: data}
+// Constructs a SimpleTask, takes an UUID as identifier.
+// A simple task is serialized in binary for quicker serialization/deserialization
+// and a tiny weight.
+func NewSimpleTask(uuid string, target string, action string, data []byte) *SimpleTask {
+    withoutHyphen := strings.Replace(uuid, "-", "", -1)
+
+    if len(withoutHyphen) > 32 {
+        println(withoutHyphen)
+        println(len(withoutHyphen))
+        return nil
+    }
+    if len(target) > 32 {
+        return nil
+    }
+    if len(action) > 32 {
+        return nil
+    }
+
+    return &SimpleTask{id: withoutHyphen, target: target, action: action, data: data}
+}
+
+func UnserializeSimpleTask(data []byte) *SimpleTask {
+    // Magic number 01
+    if byte[0] != 0 || byte[1] != 1 {
+        return nil
+    }
+
+    // TODO
+
+    return serialized
 }
 
 func (t *SimpleTask) GetId() string {
@@ -49,4 +82,35 @@ func (t *SimpleTask) GetAction() string {
 
 func (t *SimpleTask) GetData() []byte {
     return t.data
+}
+
+// Format of a simple task:
+// 2 bytes      : magic number
+// 32 bytes     : task ID
+// 32 bytes     : target
+// 32 bytes     : action
+// 8 bytes      : data length : n
+// n bytes      : data
+func (t *SimpleTask) Serialize() []byte {
+    serialized := make([]byte, 2 + 32 + 32 + 32 + 8 + len(t.data))
+
+    // Magic number
+    copy(serialized[0:], []byte("01"))
+
+    // Task ID
+    copy(serialized[2:], []byte(t.id));
+
+    // Target
+    copy(serialized[34:], []byte(t.target))
+
+    // Action
+    copy(serialized[66:], []byte(t.action))
+
+    // Len
+    binary.PutUvarint(serialized[98:], uint64(len(t.data)))
+
+    // Data
+    copy(serialized[106:], t.data)
+
+    return serialized
 }

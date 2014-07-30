@@ -12,7 +12,7 @@ type NsqBroadcaster struct {
 }
 
 func (b *NsqBroadcaster) Broadcast(task Task) error {
-    err := b.producer.Publish(task.GetTarget(), task.GetData())
+    err := b.producer.Publish(task.GetTarget(), task.Serialize())
     return err
 }
 

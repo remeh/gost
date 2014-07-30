@@ -66,7 +66,7 @@ func (w *PrinterWorker) Connect(gost Gost) error {
 
 
 func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
-    fmt.Printf("[WORKER] [writer] %s\n", m)
+    fmt.Printf("[WORKER] [writer] %s\n", m.Body)
     m.Finish()
     return nil
 }

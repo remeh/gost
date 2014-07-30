@@ -2,6 +2,7 @@ package gost
 
 import (
     "fmt"
+    "io/ioutil"
     "net/http"
 
     "github.com/remeh/go-webserver"
@@ -23,7 +24,7 @@ func (c *HttpController) Start() {
     c.httpServer.Init()
 
     // A post action to receive the task to execute.
-    c.httpServer.Router.Add("Http controller action", "POST", &HttpControllerAction{c.gost}, "/:topic/:tid")
+    c.httpServer.Router.Add("Http controller action", "POST", &HttpControllerAction{c.gost}, "/:topic/:action/:tid")
 
     // Let's listen for HTTP call in background.
     fmt.Printf("[gost] [HttpController] Starts on port %d\n", CONTROLLER_HTTP_PORT)
@@ -47,16 +48,25 @@ func (a *HttpControllerAction) Execute(writer http.ResponseWriter, request *http
     if len(tid) == 0 {
         return 500, "No task id provided." // TODO json error response
     }
+
     topic := parameters["topic"]
     if len(topic) == 0 {
         return 500, "No topic provided." // TODO json error response
     }
 
+    action := parameters["action"]
+    if len(topic) == 0 {
+        return 500, "No actionprovided." // TODO json error response
+    }
+
     // TODO read the body
-    body := []byte("Content of the task")
+    body, err := ioutil.ReadAll(request.Body)
+    if err != nil {
+        return 500, "Unable to read the body." // TODO json error response
+    }
 
     //id      := uuid.New()
-    task    := NewSimpleTask(tid, topic, body)
+    task    := NewSimpleTask(tid, topic, action, body)
 
     // Broadcast the task to the worker.
     a.gost.GetBroadcaster().Broadcast(task)
