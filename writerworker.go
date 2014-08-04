@@ -1,7 +1,6 @@
 package gost
 
 import (
-    "errors"
     "fmt"
     "github.com/bitly/go-nsq"
 )
@@ -10,6 +9,7 @@ import (
 // to do, print them on the stdout and put them
 // in the storage system for client to retrieve the result.
 type PrinterWorker struct {
+    SimpleWorker
     target      string          // target represented by this worker
     action      string          // the action to listen for
     consumer    *nsq.Consumer   // the NSQ consumer listening for work
@@ -23,13 +23,10 @@ func NewPrinterWorker(target string, action string) *PrinterWorker {
 func (w *PrinterWorker) Start(gost Gost) error {
     w.gost = gost
 
-    // Creates the new consumer
-    config := nsq.NewConfig()
-    config.MaxInFlight = 5
-    consumer, err := nsq.NewConsumer(w.target, w.action, config)
+    consumer, err := w.Init(gost, w.target, w.action, *nsq.NewConfig())
 
     if err != nil {
-        return err;
+        return err
     }
 
     // Stores it in the worker
@@ -42,39 +39,10 @@ func (w *PrinterWorker) Start(gost Gost) error {
 
     fmt.Println("[WORKER] [writer] Handler attached.")
 
+    // Connects the consumer to the broadcaster
+    w.Connect(consumer, gost)
+
     // Connects the worker to NSQ
-    return w.Connect(gost)
-}
-
-func (w *PrinterWorker) Connect(gost Gost) error {
-    config := gost.GetConfig()
-
-    // Use the config to know to which address
-    // we want to connect for NSQ
-    var err error
-
-    if len(config.Nsqlookupds) != 0 {
-        err = w.consumer.ConnectToNSQLookupds(config.Nsqlookupds)
-    } else {
-        err = w.consumer.ConnectToNSQDs(config.Nsqds)
-    }
-
-    if err != nil {
-        fmt.Println("[WORKER] [writer] ERROR - Unable to connect the PrinterWorker : ")
-        fmt.Printf("[WORKER] [writer] ERROR - %s\n", err)
-        return errors.New("Unable to start the PrinterWorker")
-    }
-    return nil
-}
-
-
-func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
-    task := UnserializeSimpleTask(m.Body)
-    if task == nil {
-        return errors.New(fmt.Sprintf("Unable to unserialize the task : %s", m.Body))
-    }
-    w.Run(task)
-    m.Finish()
     return nil
 }
 
