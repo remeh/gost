@@ -18,15 +18,18 @@ func (s *EtcdStorage) Init(config Config) error {
     // Connect
     s.client = etcd.NewClient(config.Etcds)
 
+    // XXX is it really needed ?
+    s.client.OpenCURL()
+
     fmt.Printf("[STORAGE] [ETCD] INFO - Etcd client created with hosts : %s\n", config.Etcds)
 
     return nil
 }
 
-func (s *EtcdStorage) Read(id []byte) []byte {
-    response, err := s.client.Get(string(id), false, false)
+func (s *EtcdStorage) Read(id string) []byte {
+    response, err := s.client.Get(id, false, false)
 
-    if err == nil || response == nil {
+    if err != nil || response == nil {
         return []byte("")
     }
 
@@ -34,5 +37,10 @@ func (s *EtcdStorage) Read(id []byte) []byte {
 }
 
 func (s *EtcdStorage) Store(id string, data []byte) {
-    s.client.Set(id, string(data), 0)
+    _, err := s.client.Set(id, string(data), 0)
+
+    // TODO err return
+    if err != nil {
+        fmt.Printf("[STORAGE] [ETCD] ERROR - Unable to storage id["+id+"], cause : %s\n", err)
+    }
 }

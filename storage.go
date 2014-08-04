@@ -4,6 +4,6 @@ package gost
 // to be retrieved by the ResponseProviders.
 type Storage interface {
     Init(config Config) error
-    Read(id []byte) []byte  // Returns the content of the task which has the given ID
+    Read(id string) []byte  // Returns the content of the task which has the given ID
     Store(id string, data []byte) // Stores the result of a task by its ID
 }

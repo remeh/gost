@@ -52,6 +52,14 @@ func NewSimpleTask(uuid string, target string, action string, data []byte) *Simp
     return &SimpleTask{id: uuid, target: target, action: action, data: data}
 }
 
+// Format of a simple task:
+// 2 bytes      : magic number
+// 8 bytes      : id length : l
+// 8 bytes      : data length : n
+// 32 bytes     : target
+// 32 bytes     : action
+// l bytes      : id
+// n bytes      : data
 func UnserializeSimpleTask(data []byte) *SimpleTask {
 
     // Magic number 01
@@ -59,25 +67,31 @@ func UnserializeSimpleTask(data []byte) *SimpleTask {
         return nil
     }
 
-    // Task ID
-    uuid := string(data[2:38])
-
-    // Target
-    target := string(data[38:70])
-
-    // Action
-    action := string(data[70:102])
-
-    // Length
-    length, err := binary.ReadUvarint(bytes.NewBuffer(data[102:110]))
+    // ID Length
+    idLength, err := binary.ReadUvarint(bytes.NewBuffer(data[2:10]))
     if err != nil {
         return nil
     }
 
-    // Data
-    readData := data[110:110+length]
+    // Data Length
+    length, err := binary.ReadUvarint(bytes.NewBuffer(data[10:18]))
+    if err != nil {
+        return nil
+    }
 
-    return NewSimpleTask(uuid, target, action, readData)
+    // Target
+    target := string(data[18:50])
+
+    // Action
+    action := string(data[50:82])
+
+    // ID
+    readId := string(data[82:82+idLength])
+
+    // Data
+    readData := data[82+idLength:82+idLength+length]
+
+    return NewSimpleTask(readId, target, action, readData)
 }
 
 func (t *SimpleTask) GetId() string {
@@ -98,32 +112,36 @@ func (t *SimpleTask) GetData() []byte {
 
 // Format of a simple task:
 // 2 bytes      : magic number
-// 32 bytes     : task ID
+// 8 bytes      : id length : l
+// 8 bytes      : data length : n
 // 32 bytes     : target
 // 32 bytes     : action
-// 8 bytes      : data length : n
+// l bytes      : id
 // n bytes      : data
 func (t *SimpleTask) Serialize() []byte {
-    serialized := make([]byte, 2 + 36 + 32 + 32 + 8 + len(t.data))
+    serialized := make([]byte, 2 + 8 + 8 + 32 + 32 + len(t.id) + len(t.data))
 
     // Magic number
     serialized[0] = 0
     serialized[1] = 1
 
-    // Task ID
-    copy(serialized[2:], []byte(t.id));
+    // Task ID length
+    binary.PutUvarint(serialized[2:], uint64(len(t.id)))
+
+    // Task data length
+    binary.PutUvarint(serialized[10:], uint64(len(t.data)))
 
     // Target
-    copy(serialized[38:], []byte(t.target))
+    copy(serialized[18:], []byte(t.target))
 
     // Action
-    copy(serialized[70:], []byte(t.action))
-
-    // Len
-    binary.PutUvarint(serialized[102:], uint64(len(t.data)))
+    copy(serialized[50:], []byte(t.action))
 
     // Data
-    copy(serialized[110:], t.data)
+    copy(serialized[82:], t.id)
+
+    // Data
+    copy(serialized[82+len(t.id):], t.data)
 
     return serialized
 }

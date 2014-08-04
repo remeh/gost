@@ -24,7 +24,9 @@ func (c *HttpController) Start() {
     c.httpServer.Init()
 
     // A post action to receive the task to execute.
-    c.httpServer.Router.Add("Http controller action", "POST", &HttpControllerAction{c.gost}, "/:topic/:action/:tid")
+    c.httpServer.Router.Add("Http post action", "POST", &HttpControllerPostAction{c.gost}, "/:topic/:action/:tid")
+    // A get action to retrieve the executed task
+    c.httpServer.Router.Add("Http get action", "GET", &HttpControllerGetAction{c.gost}, "/:tid")
 
     // Let's listen for HTTP call in background.
     fmt.Printf("[gost] [HttpController] Starts on port %d\n", CONTROLLER_HTTP_PORT)
@@ -36,14 +38,14 @@ func (c *HttpController) Close() {
 
 // The action which receive the HTTP call to broadcast
 // a task.
-type HttpControllerAction struct {
+type HttpControllerPostAction struct {
     gost        Gost
 }
 
-func (a *HttpControllerAction) Init() {
+func (a *HttpControllerPostAction) Init() {
 }
 
-func (a *HttpControllerAction) Execute(writer http.ResponseWriter, request *http.Request, parameters map[string]string) (int, string) {
+func (a *HttpControllerPostAction) Execute(writer http.ResponseWriter, request *http.Request, parameters map[string]string) (int, string) {
     tid := parameters["tid"]
     if len(tid) == 0 {
         return 500, "" // TODO json error response
@@ -71,4 +73,22 @@ func (a *HttpControllerAction) Execute(writer http.ResponseWriter, request *http
     a.gost.GetBroadcaster().Broadcast(task)
 
     return 200, ""
+}
+
+// The action which receive the HTTP call to provide
+// the content of an executed task.
+type HttpControllerGetAction struct {
+    gost        Gost
+}
+
+func (a *HttpControllerGetAction) Init() {
+}
+
+func (a *HttpControllerGetAction) Execute(writer http.ResponseWriter, request *http.Request, parameters map[string]string) (int, string) {
+    tid := parameters["tid"]
+    if len(tid) == 0 {
+        return 500, "" // TODO json error response
+    }
+
+    return 200, string(a.gost.GetStorage().Read(tid))
 }
