@@ -23,6 +23,8 @@ func (s *EtcdStorage) Init(config Config) error {
     return nil
 }
 
+// Reads in Etcd with the given ID and returns
+// what have be found.
 func (s *EtcdStorage) Read(id string) []byte {
     response, err := s.client.Get(id, false, false)
 
@@ -33,11 +35,11 @@ func (s *EtcdStorage) Read(id string) []byte {
     return []byte(response.Node.Value)
 }
 
-func (s *EtcdStorage) Store(id string, data []byte) {
+// Stores the given data into the given ID in Etcd.
+func (s *EtcdStorage) Store(id string, data []byte) error {
     _, err := s.client.Set(id, string(data), 0)
 
-    // TODO err return
     if err != nil {
-        fmt.Printf("[STORAGE] [ETCD] ERROR - Unable to storage id["+id+"], cause : %s\n", err)
+        return err
     }
 }

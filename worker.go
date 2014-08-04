@@ -57,7 +57,9 @@ func (w *SimpleWorker) Connect(consumer *nsq.Consumer, gost Gost) error {
     return nil
 }
 
-
+// Handles the message coming from NSQ, unserialize
+// it to create a task, execute it in the worker and
+// finally call the gost storage to store the result.
 func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
     task := UnserializeSimpleTask(m.Body)
     if task == nil {
@@ -68,7 +70,10 @@ func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
     returnedTask, result := w.Run(task)
 
     // Store the result
-    w.gost.GetStorage().Store(returnedTask.GetId(), result)
+    err := w.gost.GetStorage().Store(returnedTask.GetId(), result)
+    if err != nil {
+        return err
+    }
 
     m.Finish()
     return nil
