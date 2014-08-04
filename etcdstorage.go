@@ -18,9 +18,6 @@ func (s *EtcdStorage) Init(config Config) error {
     // Connect
     s.client = etcd.NewClient(config.Etcds)
 
-    // XXX is it really needed ?
-    s.client.OpenCURL()
-
     fmt.Printf("[STORAGE] [ETCD] INFO - Etcd client created with hosts : %s\n", config.Etcds)
 
     return nil
