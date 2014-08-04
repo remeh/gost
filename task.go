@@ -35,21 +35,21 @@ type SimpleTask struct {
     data        []byte
 }
 
-// Constructs a SimpleTask, takes an UUID as identifier.
+// Constructs a SimpleTask.
 // A simple task is serialized in binary for quicker serialization/deserialization
 // and a tiny weight.
-func NewSimpleTask(uuid string, target string, action string, data []byte) *SimpleTask {
-    if len(uuid) > 36 {
+func NewSimpleTask(id string, target string, action string, data []byte) *SimpleTask {
+    if len(id) == 0 {
         return nil
     }
-    if len(target) > 32 {
+    if len(target) == 0 {
         return nil
     }
-    if len(action) > 32 {
+    if len(action) == 0 {
         return nil
     }
 
-    return &SimpleTask{id: uuid, target: target, action: action, data: data}
+    return &SimpleTask{id: id, target: target, action: action, data: data}
 }
 
 // Format of a simple task:

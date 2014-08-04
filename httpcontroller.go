@@ -6,7 +6,6 @@ import (
     "net/http"
 
     "github.com/remeh/go-webserver"
-//  "code.google.com/p/go-uuid/uuid"
 )
 
 const (
