@@ -13,15 +13,18 @@ import (
 type Worker interface {
     Init(gost Gost, target string, action string, config nsq.Config) (*nsq.Consumer, error)
     Stop()
-    Run(Task) []byte    // Executes the supplied task given by the broadcaster
+    Run(Task) (Task, []byte)    // Executes the supplied task given by the broadcaster
 }
 
 // A simple worker is a basic implementation using the NSQ broadcaster.
 type SimpleWorker struct {
+    gost Gost
 }
 
 // TODO nsq config should be abstracted
 func (w *SimpleWorker) Init(gost Gost, target string, action string, config nsq.Config) (*nsq.Consumer, error) {
+    w.gost = gost
+
     // Creates the new consumer
     consumer, err := nsq.NewConsumer(target, action, &config)
 
@@ -60,7 +63,13 @@ func (w *PrinterWorker) HandleMessage(m *nsq.Message) error {
     if task == nil {
         return errors.New(fmt.Sprintf("Unable to unserialize the task : %s", m.Body))
     }
-    w.Run(task)
+
+    // Retrieve the result of the task execution
+    returnedTask, result := w.Run(task)
+
+    // Store the result
+    w.gost.GetStorage().Store(returnedTask.GetId(), result)
+
     m.Finish()
     return nil
 }

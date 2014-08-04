@@ -46,11 +46,9 @@ func (w *PrinterWorker) Start(gost Gost) error {
     return nil
 }
 
-func (w *PrinterWorker) Run(task Task) []byte {
+func (w *PrinterWorker) Run(task Task) (Task, []byte) {
     fmt.Printf("[WORKER] [writer] [Target: %s] [Action: %s] %s\n", task.GetTarget(), task.GetAction(), task.GetData())
-    // Store the result
-    w.gost.GetStorage().Store(task.GetId(), task.GetData())
-    return nil
+    return task, task.GetData()
 }
 
 func (w *PrinterWorker) Stop() {
