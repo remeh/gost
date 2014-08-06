@@ -42,4 +42,6 @@ func (s *EtcdStorage) Store(id string, data []byte) error {
     if err != nil {
         return err
     }
+
+    return nil
 }
