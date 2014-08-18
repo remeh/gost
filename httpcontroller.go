@@ -33,6 +33,7 @@ func (c *HttpController) Start() {
 }
 
 func (c *HttpController) Close() {
+    // Nothing to do or maybe stop the HTTP server.
 }
 
 // The action which receive the HTTP call to broadcast

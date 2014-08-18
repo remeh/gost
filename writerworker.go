@@ -1,7 +1,8 @@
 package gost
 
 import (
-    "fmt"
+    "log"
+
     "github.com/bitly/go-nsq"
 )
 
@@ -32,12 +33,12 @@ func (w *PrinterWorker) Start(gost Gost) error {
     // Stores it in the worker
     w.consumer = consumer
 
-    fmt.Println("[WORKER] [writer] Created")
+    log.Println("[WORKER] [logger] Created")
 
     // The worker handle the message reception
     w.consumer.AddHandler(w)
 
-    fmt.Println("[WORKER] [writer] Handler attached.")
+    log.Println("[WORKER] [logger] Handler attached.")
 
     // Connects the consumer to the broadcaster
     w.Connect(consumer, gost)
@@ -47,7 +48,7 @@ func (w *PrinterWorker) Start(gost Gost) error {
 }
 
 func (w *PrinterWorker) Run(task Task) (Task, []byte) {
-    fmt.Printf("[WORKER] [writer] [Target: %s] [Action: %s] %s\n", task.GetTarget(), task.GetAction(), task.GetData())
+    log.Printf("[WORKER] [logger] [Target: %s] [Action: %s] %s\n", task.GetTarget(), task.GetAction(), task.GetData())
     return task, task.GetData()
 }
 
