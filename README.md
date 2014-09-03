@@ -1,7 +1,8 @@
 Gost
 =====
 
-The lazy protocol.
+A distributed realtime computation system for Go applications.
+Using NSQ to broadcast and load-balance tasks pushed on one of the Gost controllers (http, rpc, ...), Gost could be a basic subsitute to Apache Storm to create scalable Go backend applications.
 
 # Dependency
 
